@@ -1,0 +1,32 @@
+{
+  "name": "mottor/stat-sdk",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Yuriy Pavlov",
+      "email": "yuriypavlov@outlook.com"
+    }
+  ],
+  "config": {
+    "platform": {
+      "php": "5.6"
+    },
+    "preferred-install": {
+      "*": "dist"
+    },
+    "sort-packages": true
+  },
+  "autoload": {
+    "psr-4": {
+      "Mottor\\Stat\\Domain\\": "src/Stat/Domain"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Mottor\\Stat\\Test\\": "src/Stat/Test"
+    }
+  },
+  "require": {
+    "phpunit/phpunit": "^5.7"
+  }
+}
