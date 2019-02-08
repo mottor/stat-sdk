@@ -9,7 +9,7 @@
   ],
   "config": {
     "platform": {
-      "php": "5.6"
+      "php": "7.0"
     },
     "preferred-install": {
       "*": "dist"
@@ -27,6 +27,6 @@
     }
   },
   "require": {
-    "phpunit/phpunit": "^5.7"
+    "phpunit/phpunit": "^6.5"
   }
 }
