@@ -2,17 +2,22 @@
 
 namespace Mottor\Stat\Domain\Visit\ValueObject;
 
+use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
 
 class Visit
 {
+    const DATE_FORMAT = 'Y-m-d';
+
     /**
      * @var integer
      */
     private $siteId;
 
     /**
+     * Represents the date of the visit without specifying the time
+     *
      * @var DateTimeInterface
      */
     private $date;
@@ -60,5 +65,36 @@ class Visit
      */
     public function isUnique() {
         return $this->isUnique;
+    }
+
+    /**
+     * @param array $properties
+     *
+     * @return Visit
+     * @throws Exception
+     */
+    public static function createFromArray(array $properties) {
+        $date = new DateTimeImmutable($properties['date']);
+
+        return new static(
+            $properties['siteId'],
+            $date,
+            $properties['isUnique']
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray() {
+        $date = $this
+            ->getDate()
+            ->format(self::DATE_FORMAT);
+
+        return [
+            'siteId'   => $this->getSiteId(),
+            'date'     => $date,
+            'isUnique' => $this->isUnique()
+        ];
     }
 }

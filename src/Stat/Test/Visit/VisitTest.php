@@ -3,6 +3,8 @@
 namespace Mottor\Stat\Test\Visit;
 
 use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Exception;
 use Mottor\Stat\Domain\Visit\ValueObject\Visit;
 
@@ -45,5 +47,38 @@ class VisitTest extends \PHPUnit\Framework\TestCase
                 $this->assertEquals("Argument 'siteId' must be a positive integer", $exception->getMessage());
             }
         }
+    }
+
+    public function testVisitCreateFromArrayMethod() {
+        $visit = [
+            'siteId'   => 1,
+            'date'     => '2019-01-01',
+            'isUnique' => false
+        ];
+
+        $visit = Visit::createFromArray($visit);
+
+        $this->assertEquals(1, $visit->getSiteId());
+        $this->assertEquals(false, $visit->isUnique());
+
+        $this->assertInstanceOf(DateTimeInterface::class, $visit->getDate());
+
+        $dateAsString = $visit
+            ->getDate()
+            ->format(Visit::DATE_FORMAT);
+
+        $this->assertEquals('2019-01-01', $dateAsString);
+    }
+
+    public function testVisitToArrayMethod() {
+        $visit = new Visit(2, new DateTimeImmutable('2020-03-03'), true);
+
+        $expected = [
+            'siteId'   => 2,
+            'date'     => '2020-03-03',
+            'isUnique' => true
+        ];
+
+        $this->assertEquals($expected, $visit->toArray());
     }
 }
