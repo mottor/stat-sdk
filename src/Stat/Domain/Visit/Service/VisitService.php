@@ -57,8 +57,8 @@ class VisitService
         $postParameters = $visit->toArray();
 
         $request = new PostRequest($uri);
-        $request->withSecretKey($this->secretKey)
-                ->withParameters($postParameters);
+        $request = $request->withSecretKey($this->secretKey)
+                           ->withParameters($postParameters);
 
         $response = $this->send($request);
 
@@ -80,8 +80,8 @@ class VisitService
         }
 
         $request = new PostRequest($uri);
-        $request->withSecretKey($this->secretKey)
-                ->withParameters($postParameters);
+        $request = $request->withSecretKey($this->secretKey)
+                           ->withParameters($postParameters);
 
         $response = $this->send($request);
 
