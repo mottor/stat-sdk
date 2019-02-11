@@ -5,6 +5,7 @@ namespace Mottor\Stat\Domain\Visit\ValueObject;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
+use InvalidArgumentException;
 
 class Visit
 {
@@ -74,6 +75,18 @@ class Visit
      * @throws Exception
      */
     public static function createFromArray(array $properties) {
+        if (!isset($properties['siteId'])) {
+            throw new InvalidArgumentException('siteId is not set');
+        }
+
+        if (!isset($properties['date'])) {
+            throw new InvalidArgumentException('date is not set');
+        }
+
+        if (!isset($properties['isUnique'])) {
+            throw new InvalidArgumentException('isUnique is not set');
+        }
+
         $date = new DateTimeImmutable($properties['date']);
 
         return new static(

@@ -6,6 +6,7 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
+use InvalidArgumentException;
 use Mottor\Stat\Domain\Visit\ValueObject\Visit;
 
 class VisitTest extends \PHPUnit\Framework\TestCase
@@ -68,6 +69,42 @@ class VisitTest extends \PHPUnit\Framework\TestCase
             ->format(Visit::DATE_FORMAT);
 
         $this->assertEquals('2019-01-01', $dateAsString);
+    }
+
+    public function testCreateFromArrayWithoutSiteId() {
+        $visit = [
+            'date'     => '2015-01-02',
+            'isUnique' => true
+        ];
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('siteId is not set');
+
+        Visit::createFromArray($visit);
+    }
+
+    public function testCreateFromArrayWithoutDate() {
+        $visit = [
+            'siteId'   => 4,
+            'isUnique' => false
+        ];
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('date is not set');
+
+        Visit::createFromArray($visit);
+    }
+
+    public function testCreateFromArrayWithoutIsUnique() {
+        $visit = [
+            'siteId' => 2,
+            'date'   => '2016-05-07'
+        ];
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('isUnique is not set');
+
+        Visit::createFromArray($visit);
     }
 
     public function testVisitToArrayMethod() {
