@@ -2,6 +2,8 @@
 
 namespace Mottor\Stat\Domain\Visit\Service;
 
+use DateTimeInterface;
+use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
@@ -14,6 +16,7 @@ class VisitService
 {
     const API_METHOD_VISIT_ADD = 'visit.add';
     const API_METHOD_VISIT_BATCH_ADD = 'visit.batchAdd';
+    const API_METHOD_VISIT_GET_BY_USER = 'visit.getByUser';
 
     /**
      * @var string
@@ -86,6 +89,39 @@ class VisitService
         $response = $this->send($request);
 
         return $response->isSuccessful();
+    }
+
+    /**
+     * @param int               $userId
+     * @param DateTimeInterface $dateStart
+     * @param DateTimeInterface $dateEnd
+     *
+     * @return array
+     * @throws GuzzleException
+     * @throws Exception
+     */
+    public function getVisitByUserId($userId, DateTimeInterface $dateStart, DateTimeInterface $dateEnd) {
+        $uri = $this->createUri(self::API_METHOD_VISIT_GET_BY_USER);
+
+        $request = new PostRequest($uri);
+
+        $dateStart = $dateStart->format(Visit::DATE_FORMAT);
+        $dateEnd = $dateEnd->format(Visit::DATE_FORMAT);
+
+        $request = $request->withSecretKey($this->secretKey)
+                           ->withParameters([
+                               'userId'    => $userId,
+                               'dateStart' => $dateStart,
+                               'dateEnd'   => $dateEnd
+                           ]);
+
+        $response = $this->send($request);
+
+        if (!$response->isSuccessful()) {
+            throw new Exception('Something has been wrong');
+        }
+
+        return $response->getData();
     }
 
     /**
