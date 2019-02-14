@@ -16,6 +16,7 @@ class VisitService
 {
     const API_METHOD_VISIT_ADD = 'visit.add';
     const API_METHOD_VISIT_BATCH_ADD = 'visit.batchAdd';
+    const API_METHOD_VISIT_GET_BY_SITE_ID = 'visit.getBySiteId';
     const API_METHOD_VISIT_GET_BY_SITE_IDS = 'visit.getBySiteIds';
 
     /**
@@ -92,6 +93,46 @@ class VisitService
     }
 
     /**
+     * @param int               $siteId
+     * @param DateTimeInterface $dateStart
+     * @param DateTimeInterface $dateEnd
+     *
+     * @return array
+     * @throws GuzzleException
+     */
+    public function getVisitBySiteId($siteId, DateTimeInterface $dateStart, DateTimeInterface $dateEnd) {
+        $uri = $this->createUri(self::API_METHOD_VISIT_GET_BY_SITE_ID);
+
+        $request = new PostRequest($uri);
+
+        $dateStart = $dateStart->format(Visit::DATE_FORMAT);
+        $dateEnd = $dateEnd->format(Visit::DATE_FORMAT);
+
+        $request = $request
+            ->withSecretKey($this->secretKey)
+            ->withParameters([
+                'siteId'    => $siteId,
+                'dateStart' => $dateStart,
+                'dateEnd'   => $dateEnd
+            ]);
+
+        $response = $this->send($request);
+
+        if (!$response->isSuccessful()) {
+            $payload = $response->getPayload();
+
+            if (isset($payload[JsonResponse::KEY_ERROR]['message'])) {
+                throw new Exception(sprintf('Something has been wrong (%s)',
+                    $payload[JsonResponse::KEY_ERROR]['message']));
+            }
+
+            throw new Exception('Something has been wrong');
+        }
+
+        return $response->getData();
+    }
+
+    /**
      * @param int[]             $siteIds
      * @param DateTimeInterface $dateStart
      * @param DateTimeInterface $dateEnd
@@ -107,21 +148,22 @@ class VisitService
         $dateStart = $dateStart->format(Visit::DATE_FORMAT);
         $dateEnd = $dateEnd->format(Visit::DATE_FORMAT);
 
-        $request = $request->withSecretKey($this->secretKey)
-                           ->withParameters([
-                               'siteIds'   => $siteIds,
-                               'dateStart' => $dateStart,
-                               'dateEnd'   => $dateEnd
-                           ]);
+        $request = $request
+            ->withSecretKey($this->secretKey)
+            ->withParameters([
+                'siteIds'   => $siteIds,
+                'dateStart' => $dateStart,
+                'dateEnd'   => $dateEnd
+            ]);
 
         $response = $this->send($request);
 
         if (!$response->isSuccessful()) {
-
             $payload = $response->getPayload();
 
             if (isset($payload[JsonResponse::KEY_ERROR]['message'])) {
-                throw new Exception(sprintf('Something has been wrong (%s)', $payload[JsonResponse::KEY_ERROR]['message']));
+                throw new Exception(sprintf('Something has been wrong (%s)',
+                    $payload[JsonResponse::KEY_ERROR]['message']));
             }
 
             throw new Exception('Something has been wrong');
