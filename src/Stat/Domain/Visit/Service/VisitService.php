@@ -16,7 +16,7 @@ class VisitService
 {
     const API_METHOD_VISIT_ADD = 'visit.add';
     const API_METHOD_VISIT_BATCH_ADD = 'visit.batchAdd';
-    const API_METHOD_VISIT_GET_BY_USER = 'visit.getByUser';
+    const API_METHOD_VISIT_GET_BY_SITE_IDS = 'visit.getBySiteIds';
 
     /**
      * @var string
@@ -92,16 +92,15 @@ class VisitService
     }
 
     /**
-     * @param int               $userId
+     * @param int[]             $siteIds
      * @param DateTimeInterface $dateStart
      * @param DateTimeInterface $dateEnd
      *
      * @return array
      * @throws GuzzleException
-     * @throws Exception
      */
-    public function getVisitByUserId($userId, DateTimeInterface $dateStart, DateTimeInterface $dateEnd) {
-        $uri = $this->createUri(self::API_METHOD_VISIT_GET_BY_USER);
+    public function getVisitBySiteIds(array $siteIds, DateTimeInterface $dateStart, DateTimeInterface $dateEnd) {
+        $uri = $this->createUri(self::API_METHOD_VISIT_GET_BY_SITE_IDS);
 
         $request = new PostRequest($uri);
 
@@ -110,7 +109,7 @@ class VisitService
 
         $request = $request->withSecretKey($this->secretKey)
                            ->withParameters([
-                               'userId'    => $userId,
+                               'siteIds'   => $siteIds,
                                'dateStart' => $dateStart,
                                'dateEnd'   => $dateEnd
                            ]);
