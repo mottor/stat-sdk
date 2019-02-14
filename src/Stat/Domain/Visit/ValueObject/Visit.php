@@ -21,7 +21,7 @@ class Visit
      *
      * @var DateTimeInterface
      */
-    private $date;
+    private $createdAt;
 
     /**
      * @var boolean
@@ -32,18 +32,18 @@ class Visit
      * Visit constructor.
      *
      * @param integer           $siteId
-     * @param DateTimeInterface $date
+     * @param DateTimeInterface $createdAt
      * @param boolean           $isUnique [optional]
      *
      * @throws Exception
      */
-    public function __construct($siteId, DateTimeInterface $date, $isUnique = false) {
+    public function __construct($siteId, DateTimeInterface $createdAt, $isUnique = false) {
         if (!preg_match('/^[1-9]\d*$/', $siteId)) {
             throw new Exception("Argument 'siteId' must be a positive integer");
         }
 
         $this->siteId = (int) $siteId;
-        $this->date = $date;
+        $this->createdAt = $createdAt;
         $this->isUnique = (bool) $isUnique;
     }
 
@@ -57,8 +57,8 @@ class Visit
     /**
      * @return DateTimeInterface
      */
-    public function getDate() {
-        return $this->date;
+    public function getCreatedAt() {
+        return $this->createdAt;
     }
 
     /**
@@ -71,7 +71,7 @@ class Visit
     /**
      * @param array $properties
      *
-     * @return Visit
+     * @return static
      * @throws Exception
      */
     public static function createFromArray(array $properties) {
@@ -79,19 +79,19 @@ class Visit
             throw new InvalidArgumentException('siteId is not set');
         }
 
-        if (!isset($properties['date'])) {
-            throw new InvalidArgumentException('date is not set');
+        if (!isset($properties['createdAt'])) {
+            throw new InvalidArgumentException('createdAt is not set');
         }
 
         if (!isset($properties['isUnique'])) {
             throw new InvalidArgumentException('isUnique is not set');
         }
 
-        $date = new DateTimeImmutable($properties['date']);
+        $createdAt = new DateTimeImmutable($properties['createdAt']);
 
         return new static(
             $properties['siteId'],
-            $date,
+            $createdAt,
             $properties['isUnique']
         );
     }
@@ -100,14 +100,14 @@ class Visit
      * @return array
      */
     public function toArray() {
-        $date = $this
-            ->getDate()
+        $createdAt = $this
+            ->getCreatedAt()
             ->format(self::DATE_FORMAT);
 
         return [
-            'siteId'   => $this->getSiteId(),
-            'date'     => $date,
-            'isUnique' => $this->isUnique()
+            'siteId'    => $this->getSiteId(),
+            'createdAt' => $createdAt,
+            'isUnique'  => $this->isUnique()
         ];
     }
 }

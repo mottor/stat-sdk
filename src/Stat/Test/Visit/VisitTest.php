@@ -16,12 +16,12 @@ class VisitTest extends \PHPUnit\Framework\TestCase
 
         $visit = new Visit(1024, $dateOfThisMoment, true);
 
-        foreach (['siteId', 'date', 'isUnique'] as $property) {
+        foreach (['siteId', 'createdAt', 'isUnique'] as $property) {
             $this->assertObjectHasAttribute($property, $visit);
         }
 
         $this->assertEquals(1024, $visit->getSiteId());
-        $this->assertEquals($dateOfThisMoment, $visit->getDate());
+        $this->assertEquals($dateOfThisMoment, $visit->getCreatedAt());
         $this->assertEquals(true, $visit->isUnique());
     }
 
@@ -52,9 +52,9 @@ class VisitTest extends \PHPUnit\Framework\TestCase
 
     public function testVisitCreateFromArrayMethod() {
         $visit = [
-            'siteId'   => 1,
-            'date'     => '2019-01-01',
-            'isUnique' => false
+            'siteId'    => 1,
+            'createdAt' => '2019-01-01',
+            'isUnique'  => false
         ];
 
         $visit = Visit::createFromArray($visit);
@@ -62,10 +62,10 @@ class VisitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(1, $visit->getSiteId());
         $this->assertEquals(false, $visit->isUnique());
 
-        $this->assertInstanceOf(DateTimeInterface::class, $visit->getDate());
+        $this->assertInstanceOf(DateTimeInterface::class, $visit->getCreatedAt());
 
         $dateAsString = $visit
-            ->getDate()
+            ->getCreatedAt()
             ->format(Visit::DATE_FORMAT);
 
         $this->assertEquals('2019-01-01', $dateAsString);
@@ -73,8 +73,8 @@ class VisitTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateFromArrayWithoutSiteId() {
         $visit = [
-            'date'     => '2015-01-02',
-            'isUnique' => true
+            'createdAt' => '2015-01-02',
+            'isUnique'  => true
         ];
 
         $this->expectException(InvalidArgumentException::class);
@@ -90,15 +90,15 @@ class VisitTest extends \PHPUnit\Framework\TestCase
         ];
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('date is not set');
+        $this->expectExceptionMessage('createdAt is not set');
 
         Visit::createFromArray($visit);
     }
 
     public function testCreateFromArrayWithoutIsUnique() {
         $visit = [
-            'siteId' => 2,
-            'date'   => '2016-05-07'
+            'siteId'    => 2,
+            'createdAt' => '2016-05-07'
         ];
 
         $this->expectException(InvalidArgumentException::class);
@@ -111,9 +111,9 @@ class VisitTest extends \PHPUnit\Framework\TestCase
         $visit = new Visit(2, new DateTimeImmutable('2020-03-03'), true);
 
         $expected = [
-            'siteId'   => 2,
-            'date'     => '2020-03-03',
-            'isUnique' => true
+            'siteId'    => 2,
+            'createdAt' => '2020-03-03',
+            'isUnique'  => true
         ];
 
         $this->assertEquals($expected, $visit->toArray());
