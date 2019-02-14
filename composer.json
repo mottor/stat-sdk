@@ -28,7 +28,7 @@
   },
   "require": {
     "ext-json": "*",
-    "mottor/api-sdk": "0.5.2",
+    "mottor/api-sdk": "0.5.3",
     "guzzlehttp/guzzle": "^6.3"
   },
   "require-dev": {

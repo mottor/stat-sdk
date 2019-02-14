@@ -117,6 +117,13 @@ class VisitService
         $response = $this->send($request);
 
         if (!$response->isSuccessful()) {
+
+            $payload = $response->getPayload();
+
+            if (isset($payload[JsonResponse::KEY_ERROR]['message'])) {
+                throw new Exception(sprintf('Something has been wrong (%s)', $payload[JsonResponse::KEY_ERROR]['message']));
+            }
+
             throw new Exception('Something has been wrong');
         }
 
