@@ -15,8 +15,11 @@ use Psr\Http\Message\RequestInterface;
 class VisitService
 {
     const API_METHOD_VISIT_ADD = 'visit.add';
+
     const API_METHOD_VISIT_BATCH_ADD = 'visit.batchAdd';
+
     const API_METHOD_VISIT_GET_BY_SITE_ID = 'visit.getBySiteId';
+
     const API_METHOD_VISIT_GET_BY_SITE_IDS = 'visit.getBySiteIds';
 
     /**
@@ -53,7 +56,11 @@ class VisitService
     /**
      * Sends a data about single visit to remote service
      *
-     * @inheritdoc
+     * @param Visit $visit
+     *
+     * @return void
+     * @throws Exception
+     * @throws GuzzleException
      */
     public function addVisit(Visit $visit) {
         $uri = $this->createUri(self::API_METHOD_VISIT_ADD);
@@ -66,13 +73,18 @@ class VisitService
 
         $response = $this->send($request);
 
-        return $response->isSuccessful();
+        $this->checkResponseStatus($response);
+        $this->checkResponseMemberStatus($response);
     }
 
     /**
      * Sends a data about group of visits to remote service
      *
-     * @inheritdoc
+     * @param Visit[] $visits
+     *
+     * @return void
+     * @throws Exception
+     * @throws GuzzleException
      */
     public function batchAddVisit(array $visits) {
         $uri = $this->createUri(self::API_METHOD_VISIT_BATCH_ADD);
@@ -89,7 +101,8 @@ class VisitService
 
         $response = $this->send($request);
 
-        return $response->isSuccessful();
+        $this->checkResponseStatus($response);
+        $this->checkResponseMemberStatus($response);
     }
 
     /**
@@ -98,6 +111,7 @@ class VisitService
      * @param DateTimeInterface $dateEnd
      *
      * @return array
+     * @throws Exception
      * @throws GuzzleException
      */
     public function getVisitBySiteId($siteId, DateTimeInterface $dateStart, DateTimeInterface $dateEnd) {
@@ -118,18 +132,10 @@ class VisitService
 
         $response = $this->send($request);
 
-        if (!$response->isSuccessful()) {
-            $payload = $response->getPayload();
+        $this->checkResponseStatus($response);
+        $this->checkResponseMemberStatus($response);
 
-            if (isset($payload[JsonResponse::KEY_ERROR]['message'])) {
-                throw new Exception(sprintf('Something has been wrong (%s)',
-                    $payload[JsonResponse::KEY_ERROR]['message']));
-            }
-
-            throw new Exception('Something has been wrong');
-        }
-
-        return $response->getData();
+        return $response->getMember(JsonResponse::MEMBER_NAME_DATA);
     }
 
     /**
@@ -138,6 +144,7 @@ class VisitService
      * @param DateTimeInterface $dateEnd
      *
      * @return array
+     * @throws Exception
      * @throws GuzzleException
      */
     public function getVisitBySiteIds(array $siteIds, DateTimeInterface $dateStart, DateTimeInterface $dateEnd) {
@@ -158,18 +165,10 @@ class VisitService
 
         $response = $this->send($request);
 
-        if (!$response->isSuccessful()) {
-            $payload = $response->getPayload();
+        $this->checkResponseStatus($response);
+        $this->checkResponseMemberStatus($response);
 
-            if (isset($payload[JsonResponse::KEY_ERROR]['message'])) {
-                throw new Exception(sprintf('Something has been wrong (%s)',
-                    $payload[JsonResponse::KEY_ERROR]['message']));
-            }
-
-            throw new Exception('Something has been wrong');
-        }
-
-        return $response->getData();
+        return $response->getMember(JsonResponse::MEMBER_NAME_DATA);
     }
 
     /**
@@ -200,5 +199,44 @@ class VisitService
         );
 
         return $response;
+    }
+
+    protected function checkResponseStatus(JsonResponse $jsonResponse) {
+        if (200 === $jsonResponse->getStatusCode()) {
+            return;
+        }
+
+        if (null !== $jsonResponse->getReasonPhrase()) {
+            $message = sprintf(
+                'Bad response (code: %s, phrase: %s)',
+                $jsonResponse->getStatusCode(),
+                $jsonResponse->getReasonPhrase()
+            );
+        } else {
+            $message = sprintf(
+                'Bad response (code: %s)',
+                $jsonResponse->getStatusCode()
+            );
+        }
+
+        throw new Exception($message);
+    }
+
+    protected function checkResponseMemberStatus(JsonResponse $jsonResponse) {
+        $status = $jsonResponse->getMember(JsonResponse::MEMBER_NAME_STATUS);
+
+        if (true === $status) {
+            return;
+        }
+
+        $error = $jsonResponse->getMember(JsonResponse::MEMBER_NAME_ERROR, []);
+
+        if (isset($error['message'])) {
+            $message = sprintf('Something has been wrong (%s)', $error['message']);
+        } else {
+            $message = 'Something has been wrong';
+        }
+
+        throw new Exception($message);
     }
 }

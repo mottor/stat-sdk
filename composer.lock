@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "084864a28250405a273676fdfde600c7",
+    "content-hash": "836165f5c37f80e5a1d3bdf0de776bd9",
     "packages": [
         {
             "name": "guzzlehttp/guzzle",
@@ -191,16 +191,16 @@
         },
         {
             "name": "mottor/api-sdk",
-            "version": "v0.5.4",
+            "version": "v0.5.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mottor/api-sdk.git",
-                "reference": "9591c708f658c38d6dcd5d8fda2228ea657f45d7"
+                "reference": "f93e79ca87a641279a3bd4926ca78d95e855fdc1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mottor/api-sdk/zipball/9591c708f658c38d6dcd5d8fda2228ea657f45d7",
-                "reference": "9591c708f658c38d6dcd5d8fda2228ea657f45d7",
+                "url": "https://api.github.com/repos/mottor/api-sdk/zipball/f93e79ca87a641279a3bd4926ca78d95e855fdc1",
+                "reference": "f93e79ca87a641279a3bd4926ca78d95e855fdc1",
                 "shasum": ""
             },
             "require": {
@@ -232,10 +232,10 @@
                 }
             ],
             "support": {
-                "source": "https://github.com/mottor/api-sdk/tree/v0.5.4",
+                "source": "https://github.com/mottor/api-sdk/tree/v0.5.5",
                 "issues": "https://github.com/mottor/api-sdk/issues"
             },
-            "time": "2019-02-14T10:44:19+00:00"
+            "time": "2019-02-20T18:46:02+00:00"
         },
         {
             "name": "psr/http-message",
