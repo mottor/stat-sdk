@@ -9,7 +9,7 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use Mottor\Api\Domain\Request\Model\PostRequest;
 use Mottor\Api\Domain\Response\Model\JsonResponse;
-use Mottor\Stat\Domain\Visit\ValueObject\Visit;
+use Mottor\Stat\Domain\Visit\Model\Visit;
 use Psr\Http\Message\RequestInterface;
 
 class VisitService

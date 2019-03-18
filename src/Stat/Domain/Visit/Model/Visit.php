@@ -1,6 +1,6 @@
 <?php
 
-namespace Mottor\Stat\Domain\Visit\ValueObject;
+namespace Mottor\Stat\Domain\Visit\Model;
 
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -43,7 +43,7 @@ class Visit
         }
 
         $this->siteId = (int) $siteId;
-        $this->createdAt = $createdAt;
+        $this->createdAt = clone $createdAt;
         $this->isUnique = (bool) $isUnique;
     }
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Mottor\Stat\Domain\Visit\ValueObject;
+namespace Mottor\Stat\Domain\Visit\Model;
 
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -49,9 +49,9 @@ class AggregatedVisit
         }
 
         $this->siteId = (int) $siteId;
-        $this->aggregatedAt = $aggregatedAt;
-        $this->count = (bool) $count;
-        $this->uniqueCount = (bool) $uniqueCount;
+        $this->aggregatedAt = clone $aggregatedAt;
+        $this->count = (int) $count;
+        $this->uniqueCount = (int) $uniqueCount;
     }
 
     /**
@@ -129,5 +129,37 @@ class AggregatedVisit
             'count'        => $this->getCount(),
             'uniqueCount'  => $this->getUniqueCount()
         ];
+    }
+
+    /**
+     * @return AggregatedVisit
+     * @throws Exception
+     */
+    public function incrementCount() {
+        $count = $this->getCount();
+        $count++;
+
+        return new static(
+            $this->getSiteId(),
+            $this->getAggregatedAt(),
+            $count,
+            $this->getUniqueCount()
+        );
+    }
+
+    /**
+     * @return AggregatedVisit
+     * @throws Exception
+     */
+    public function incrementUniqueCount() {
+        $uniqueCount = $this->getUniqueCount();
+        $uniqueCount++;
+
+        return new static(
+            $this->getSiteId(),
+            $this->getAggregatedAt(),
+            $this->getCount(),
+            $uniqueCount
+        );
     }
 }

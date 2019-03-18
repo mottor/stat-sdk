@@ -7,7 +7,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
-use Mottor\Stat\Domain\Visit\ValueObject\Visit;
+use Mottor\Stat\Domain\Visit\Model\Visit;
 
 class VisitTest extends \PHPUnit\Framework\TestCase
 {
