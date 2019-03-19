@@ -4,8 +4,9 @@ namespace Mottor\Stat\Test\Visit;
 
 use DateTime;
 use Mottor\Stat\Domain\Visit\Model\AggregatedVisit;
+use PHPUnit\Framework\TestCase;
 
-class AggregatedVisitTest extends \PHPUnit\Framework\TestCase
+class AggregatedVisitTest extends TestCase
 {
     public function testAggregatedVisitProperties() {
         $aggregatedAt = new DateTime();

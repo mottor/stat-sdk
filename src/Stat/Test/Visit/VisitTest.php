@@ -8,8 +8,9 @@ use DateTimeInterface;
 use Exception;
 use InvalidArgumentException;
 use Mottor\Stat\Domain\Visit\Model\Visit;
+use PHPUnit\Framework\TestCase;
 
-class VisitTest extends \PHPUnit\Framework\TestCase
+class VisitTest extends TestCase
 {
     public function testVisitProperties() {
         $dateOfThisMoment = new DateTime();
