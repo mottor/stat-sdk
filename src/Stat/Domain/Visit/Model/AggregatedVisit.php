@@ -38,12 +38,12 @@ class AggregatedVisit
      *
      * @param integer           $siteId
      * @param DateTimeInterface $aggregatedAt
-     * @param int               $count
-     * @param int               $uniqueCount
+     * @param int               $count       [optional]
+     * @param int               $uniqueCount [optional]
      *
      * @throws Exception
      */
-    public function __construct($siteId, DateTimeInterface $aggregatedAt, $count, $uniqueCount) {
+    public function __construct($siteId, DateTimeInterface $aggregatedAt, $count = 0, $uniqueCount = 0) {
         if (!preg_match('/^[1-9]\d*$/', $siteId)) {
             throw new Exception("Argument 'siteId' must be a positive integer");
         }
