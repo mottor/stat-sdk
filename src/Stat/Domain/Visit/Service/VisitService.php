@@ -6,14 +6,16 @@ use DateTimeInterface;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\GuzzleException;
 use Mottor\Api\Domain\Request\Model\PostRequest;
 use Mottor\Api\Domain\Response\Model\JsonResponse;
+use Mottor\Stat\Domain\Visit\Model\AggregatedVisit;
 use Mottor\Stat\Domain\Visit\Model\Visit;
 use Psr\Http\Message\RequestInterface;
 
 class VisitService
 {
+    const API_METHOD_HEALTHCHECK = 'healthcheck';
+
     const API_METHOD_VISIT_ADD = 'visit.add';
 
     const API_METHOD_VISIT_BATCH_ADD = 'visit.batchAdd';
@@ -21,6 +23,10 @@ class VisitService
     const API_METHOD_VISIT_GET_BY_SITE_ID = 'visit.getBySiteId';
 
     const API_METHOD_VISIT_GET_BY_SITE_IDS = 'visit.getBySiteIds';
+
+    const API_METHOD_AGGREGATED_VISIT_GET_BY_SITE_ID = 'aggregatedVisit.getBySiteId';
+
+    const API_METHOD_AGGREGATED_VISIT_GET_BY_SITE_IDS = 'aggregatedVisit.getBySiteIds';
 
     /**
      * @var string
@@ -53,14 +59,23 @@ class VisitService
         $this->httpClient = $httpClient;
     }
 
+    public function healthcheck() {
+        $uri = $this->createUri(self::API_METHOD_HEALTHCHECK);
+
+        $request = new PostRequest($uri);
+
+        $response = $this->send($request);
+
+        $this->checkResponseStatus($response);
+        $this->checkResponseMemberStatus($response);
+    }
+
     /**
      * Sends a data about single visit to remote service
      *
      * @param Visit $visit
      *
      * @return void
-     * @throws Exception
-     * @throws GuzzleException
      */
     public function addVisit(Visit $visit) {
         $uri = $this->createUri(self::API_METHOD_VISIT_ADD);
@@ -83,8 +98,6 @@ class VisitService
      * @param Visit[] $visits
      *
      * @return void
-     * @throws Exception
-     * @throws GuzzleException
      */
     public function batchAddVisit(array $visits) {
         $uri = $this->createUri(self::API_METHOD_VISIT_BATCH_ADD);
@@ -111,8 +124,8 @@ class VisitService
      * @param DateTimeInterface $dateEnd
      *
      * @return array
-     * @throws Exception
-     * @throws GuzzleException
+     *
+     * @deprecated
      */
     public function getVisitBySiteId($siteId, DateTimeInterface $dateStart, DateTimeInterface $dateEnd) {
         $uri = $this->createUri(self::API_METHOD_VISIT_GET_BY_SITE_ID);
@@ -144,8 +157,8 @@ class VisitService
      * @param DateTimeInterface $dateEnd
      *
      * @return array
-     * @throws Exception
-     * @throws GuzzleException
+     *
+     * @deprecated
      */
     public function getVisitBySiteIds(array $siteIds, DateTimeInterface $dateStart, DateTimeInterface $dateEnd) {
         $uri = $this->createUri(self::API_METHOD_VISIT_GET_BY_SITE_IDS);
@@ -172,6 +185,86 @@ class VisitService
     }
 
     /**
+     * @param int               $siteId
+     * @param DateTimeInterface $dateStart
+     * @param DateTimeInterface $dateEnd
+     *
+     * @return AggregatedVisit[]
+     */
+    public function getAggregatedVisitBySiteId($siteId, DateTimeInterface $dateStart, DateTimeInterface $dateEnd) {
+        $uri = $this->createUri(self::API_METHOD_AGGREGATED_VISIT_GET_BY_SITE_ID);
+
+        $request = new PostRequest($uri);
+
+        $dateStart = $dateStart->format(Visit::DATE_FORMAT);
+        $dateEnd = $dateEnd->format(Visit::DATE_FORMAT);
+
+        $request = $request
+            ->withSecretKey($this->secretKey)
+            ->withParameters([
+                'siteId'    => $siteId,
+                'dateStart' => $dateStart,
+                'dateEnd'   => $dateEnd
+            ]);
+
+        $response = $this->send($request);
+
+        $this->checkResponseStatus($response);
+        $this->checkResponseMemberStatus($response);
+
+        $records = $response->getMember(JsonResponse::MEMBER_NAME_DATA);
+
+        return array_map(
+            function (array $record) {
+                return AggregatedVisit::createFromArray($record);
+            },
+            $records
+        );
+    }
+
+    /**
+     * @param int[]             $siteIds
+     * @param DateTimeInterface $dateStart
+     * @param DateTimeInterface $dateEnd
+     *
+     * @return AggregatedVisit[]
+     */
+    public function getAggregatedVisitBySiteIds(
+        array $siteIds,
+        DateTimeInterface $dateStart,
+        DateTimeInterface $dateEnd
+    ) {
+        $uri = $this->createUri(self::API_METHOD_AGGREGATED_VISIT_GET_BY_SITE_IDS);
+
+        $request = new PostRequest($uri);
+
+        $dateStart = $dateStart->format(Visit::DATE_FORMAT);
+        $dateEnd = $dateEnd->format(Visit::DATE_FORMAT);
+
+        $request = $request
+            ->withSecretKey($this->secretKey)
+            ->withParameters([
+                'siteIds'   => $siteIds,
+                'dateStart' => $dateStart,
+                'dateEnd'   => $dateEnd
+            ]);
+
+        $response = $this->send($request);
+
+        $this->checkResponseStatus($response);
+        $this->checkResponseMemberStatus($response);
+
+        $records = $response->getMember(JsonResponse::MEMBER_NAME_DATA);
+
+        return array_map(
+            function (array $record) {
+                return AggregatedVisit::createFromArray($record);
+            },
+            $records
+        );
+    }
+
+    /**
      * @param string $methodName
      *
      * @return string
@@ -187,7 +280,6 @@ class VisitService
      * @param RequestInterface $request
      *
      * @return JsonResponse
-     * @throws GuzzleException
      */
     protected function send(RequestInterface $request) {
         $response = $this->httpClient->send($request);
@@ -201,6 +293,11 @@ class VisitService
         return $response;
     }
 
+    /**
+     * @param JsonResponse $jsonResponse
+     *
+     * @return void
+     */
     protected function checkResponseStatus(JsonResponse $jsonResponse) {
         if (200 === $jsonResponse->getStatusCode()) {
             return;
@@ -222,6 +319,11 @@ class VisitService
         throw new Exception($message);
     }
 
+    /**
+     * @param JsonResponse $jsonResponse
+     *
+     * @return void
+     */
     protected function checkResponseMemberStatus(JsonResponse $jsonResponse) {
         $status = $jsonResponse->getMember(JsonResponse::MEMBER_NAME_STATUS);
 
